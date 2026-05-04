@@ -1,337 +1,209 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Нейро-Квест: Алгоритм Восстановления</title>
+    <title>Что помогает улучшить восстановление после инсульта</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Roboto:wght@400;500&amp;display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         :root {
-            --primary: #0047AB;
+            --primary-purple: #6D28D9;
+            --light-purple: #F5F3FF;
         }
         
         body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
-        
-        .title-font {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .step-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfcfd;
         }
         
         .progress-bar {
-            transition: width 0.5s ease-in-out;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .input-field {
-            transition: all 0.2s ease;
-        }
-        
-        .input-field:focus {
-            box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.2);
+        .step-transition {
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .checkmark {
-            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes pop {
-            0% { transform: scale(0.3); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
+        .purple-gradient {
+            background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-12">
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl overflow-hidden">
-        <!-- Header -->
-        <div class="bg-white border-b sticky top-0 z-50">
-            <div class="px-6 py-4 flex items-center justify-between">
-                <div>
-                    <h1 class="title-font text-2xl font-semibold text-slate-900 tracking-tight">
-                        Нейро-Квест
-                    </h1>
-                    <p class="text-xs text-slate-500 -mt-1">Алгоритм Восстановления</p>
+<body class="min-h-screen">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl flex flex-col">
+        <!-- Progress Header -->
+        <div class="sticky top-0 z-50 bg-white border-b border-purple-100">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400">Прогресс квеста</span>
+                    <span id="progress-text" class="text-xs font-bold text-purple-700">0%</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div id="step-indicator" 
-                         class="text-xs font-medium px-3 py-1 bg-slate-100 text-slate-600 rounded-full flex items-center gap-1">
-                        <span id="current-step">1</span>/4
-                    </div>
+                <div class="w-full bg-purple-100 h-2 rounded-full overflow-hidden">
+                    <div id="progress-line" class="progress-bar h-full purple-gradient" style="width: 0%"></div>
                 </div>
-            </div>
-            
-            <!-- Progress Bar -->
-            <div class="h-1.5 bg-slate-100">
-                <div id="progress" 
-                     class="progress-bar h-1.5 bg-[#0047AB] rounded-r-full"
-                     style="width: 0%"></div>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="p-6" id="main-content">
-            <!-- Will be populated by JS -->
-        </div>
+        <main id="app-container" class="flex-1 p-6 flex flex-col justify-center">
+            <!-- Content injected by JS -->
+        </main>
     </div>
 
     <script>
-        // Tailwind script already loaded via CDN
-        
-        const keys = {
-            1: "nutridrink",
-            2: "улучшает",
-            3: "восстановление"
+        const CONFIG = {
+            keys: {
+                1: "nutridrink",
+                2: "улучшает",
+                3: "восстановление"
+            },
+            storageKey: 'med_quest_data'
         };
 
-        let currentStep = 1;
+        let state = {
+            step: 1,
+            answers: { 1: null, 2: null, 3: null },
+            isWinner: true
+        };
 
-        function saveProgress() {
-            localStorage.setItem('neuroquest_progress', currentStep);
-        }
-
-        function loadProgress() {
-            const saved = localStorage.getItem('neuroquest_progress');
-            if (saved) {
-                currentStep = parseInt(saved);
-            }
-        }
-
-        function updateProgressBar() {
-            const progressPercent = Math.min(((currentStep - 1) / 3) * 100, 100);
-            document.getElementById('progress').style.width = `${progressPercent}%`;
-            
-            const indicator = document.getElementById('step-indicator');
-            document.getElementById('current-step').textContent = currentStep;
-        }
-
-        function showStep() {
-            const content = document.getElementById('main-content');
-            updateProgressBar();
-            
-            if (currentStep === 1) {
-                content.innerHTML = `
-                    <div class="step-card bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-                        <div class="flex justify-center mb-6">
-                            <div class="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center">
-                                <i class="fa-solid fa-user-doctor text-4xl text-[#0047AB]"></i>
-                            </div>
-                        </div>
-                        
-                        <h2 class="text-3xl font-semibold text-center text-slate-900 mb-3 title-font">Добро пожаловать!</h2>
-                        <p class="text-slate-600 text-center leading-relaxed mb-8">
-                            Пройдите квест и получите подарок на стенде компании Nutricia
-                        </p>
-                        
-                        <div class="space-y-4">
-                            <button onclick="startRegistration()" 
-                                    class="w-full bg-[#0047AB] hover:bg-[#003580] text-white font-medium py-5 px-8 rounded-2xl text-lg shadow-lg shadow-blue-200 transition-all active:scale-[0.97]">
-                                Заполнить анкету и начать
-                            </button>
-                            
-                            <div class="pt-4">
-                                <p class="text-xs uppercase tracking-widest text-slate-500 mb-2 text-center">Ключ 1</p>
-                                <div class="flex gap-3">
-                                    <input id="key1-input" 
-                                           type="text"
-                                           placeholder="Введите Key 1"
-                                           class="input-field flex-1 px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none text-lg">
-                                    <button onclick="checkKey(1)"
-                                            class="bg-slate-900 hover:bg-black text-white px-7 rounded-2xl font-medium transition-all active:scale-[0.97]">
-                                        OK
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-8">
-                        <p class="text-xs text-slate-400">Шаг 1 • Регистрация</p>
-                    </div>
-                `;
-            } 
-            else if (currentStep === 2) {
-                content.innerHTML = `
-                    <div class="step-card bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-                        <div class="flex justify-center mb-6">
-                            <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center">
-                                <i class="fa-solid fa-chalkboard-user text-4xl text-emerald-600"></i>
-                            </div>
-                        </div>
-                        
-                        <h2 class="text-2xl font-semibold text-center text-slate-900 mb-6 leading-tight">
-                            Терапия
-                        </h2>
-                        
-                        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 mb-8">
-                            <p class="text-slate-700 leading-relaxed">
-                                Посетите симпозиум: «Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола Центрис в профилактике инвалидизации»
-                            </p>
-                        </div>
-                        
-                        <div>
-                            <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">Ключ 2</p>
-                            <div class="flex gap-3">
-                                <input id="key2-input" 
-                                       type="text"
-                                       placeholder="Введите Key 2"
-                                       class="input-field flex-1 px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none text-lg">
-                                <button onclick="checkKey(2)"
-                                        class="bg-slate-900 hover:bg-black text-white px-7 rounded-2xl font-medium transition-all active:scale-[0.97]">
-                                    OK
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-8">
-                        <p class="text-xs text-slate-400">Шаг 2 • Симпозиум</p>
-                    </div>
-                `;
-            } 
-            else if (currentStep === 3) {
-                content.innerHTML = `
-                    <div class="step-card bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-                        <div class="flex justify-center mb-6">
-                            <div class="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center">
-                                <i class="fa-solid fa-video text-4xl text-amber-600"></i>
-                            </div>
-                        </div>
-                        
-                        <h2 class="text-2xl font-semibold text-center text-slate-900 mb-6">Реабилитация</h2>
-                        
-                        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 mb-8">
-                            <p class="text-slate-700 leading-relaxed">
-                                Посмотрите видео на стенде компании и введите финальный код.
-                            </p>
-                        </div>
-                        
-                        <div>
-                            <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">Ключ 3</p>
-                            <div class="flex gap-3">
-                                <input id="key3-input" 
-                                       type="text"
-                                       placeholder="Введите Key 3"
-                                       class="input-field flex-1 px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none text-lg">
-                                <button onclick="checkKey(3)"
-                                        class="bg-slate-900 hover:bg-black text-white px-7 rounded-2xl font-medium transition-all active:scale-[0.97]">
-                                    OK
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-8">
-                        <p class="text-xs text-slate-400">Шаг 3 • Финал</p>
-                    </div>
-                `;
-            } 
-            else if (currentStep === 4) {
-                content.innerHTML = `
-                    <div class="min-h-[70vh] flex flex-col items-center justify-center text-center px-6">
-                        <div class="checkmark w-28 h-28 bg-emerald-100 rounded-full flex items-center justify-center mb-8">
-                            <i class="fa-solid fa-check text-6xl text-emerald-600"></i>
-                        </div>
-                        
-                        <h2 class="text-3xl font-semibold text-slate-900 mb-3 title-font">Поздравляем!</h2>
-                        <p class="text-xl text-emerald-600 font-medium mb-8">Курс восстановления завершен</p>
-                        
-                        <div class="max-w-xs bg-white border border-emerald-100 rounded-3xl p-8 shadow-sm">
-                            <p class="text-slate-700 leading-relaxed">
-                                Покажите этот экран менеджеру на стенде, чтобы получить подарок.
-                            </p>
-                        </div>
-                        
-                        <button onclick="restartQuest()" 
-                                class="mt-12 text-slate-400 hover:text-slate-600 flex items-center gap-2 text-sm font-medium mx-auto">
-                            <i class="fa-solid fa-rotate"></i>
-                            <span>Начать заново</span>
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        function startRegistration() {
-            window.open('https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6', '_blank');
-            // Still allow key input immediately
-        }
-
-        function checkKey(step) {
-            let inputId = `key${step}-input`;
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            
-            const value = input.value.trim().toLowerCase();
-            const correct = keys[step];
-            
-            if (value === correct) {
-                if (currentStep === step) {
-                    currentStep++;
-                    saveProgress();
-                    showStep();
-                }
-            } else {
-                input.classList.add('!border-red-400');
-                setTimeout(() => {
-                    input.classList.remove('!border-red-400');
-                }, 1500);
-                
-                // Visual feedback
-                const notif = document.createElement('div');
-                notif.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#ef4444; color:white; padding:12px 24px; border-radius:9999px; font-size:14px; box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1); z-index:9999;';
-                notif.textContent = 'Неверный ключ. Попробуйте ещё раз.';
-                document.body.appendChild(notif);
-                
-                setTimeout(() => {
-                    notif.style.transition = 'all 0.3s';
-                    notif.style.opacity = '0';
-                    setTimeout(() => notif.remove(), 300);
-                }, 2200);
-            }
-        }
-
-        function restartQuest() {
-            if (confirm('Начать квест заново?')) {
-                currentStep = 1;
-                localStorage.removeItem('neuroquest_progress');
-                showStep();
-            }
-        }
-
-        // Initialize
+        // Инициализация
         function init() {
-            loadProgress();
-            
-            // Make sure we don't go beyond 4
-            if (currentStep > 4) currentStep = 4;
-            
-            showStep();
-            
-            // Keyboard support for inputs
-            document.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const activeInput = document.querySelector('input:focus');
-                    if (activeInput) {
-                        const stepMatch = activeInput.id.match(/key(\d)-input/);
-                        if (stepMatch) {
-                            checkKey(parseInt(stepMatch[1]));
-                        }
-                    }
-                }
-            });
+            const saved = localStorage.getItem(CONFIG.storageKey);
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+            render();
         }
 
-        // Start the app
+        function save() {
+            localStorage.setItem(CONFIG.storageKey, JSON.stringify(state));
+        }
+
+        function handleNext(inputId, stepNum) {
+            const input = document.getElementById(inputId);
+            const value = input.value.trim().toLowerCase();
+            
+            // Сохраняем ответ
+            state.answers[stepNum] = value;
+            
+            // Если хоть один ответ неверный — флаг победителя сбрасывается
+            if (value !== CONFIG.keys[stepNum].toLowerCase()) {
+                state.isWinner = false;
+            }
+
+            state.step++;
+            save();
+            render();
+        }
+
+        function restart() {
+            localStorage.removeItem(CONFIG.storageKey);
+            state = { step: 1, answers: { 1: null, 2: null, 3: null }, isWinner: true };
+            render();
+        }
+
+        function updateUI() {
+            const percent = ((state.step - 1) / 3) * 100;
+            document.getElementById('progress-line').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${Math.round(percent)}%`;
+        }
+
+        function render() {
+            const container = document.getElementById('app-container');
+            updateUI();
+
+            if (state.step === 1) {
+                container.innerHTML = `
+                    <div class="step-transition">
+                        <h1 class="text-2xl font-bold text-slate-800 mb-6 text-center">Что помогает улучшить восстановление после инсульта</h1>
+                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
+                            <h2 class="font-bold text-purple-800 mb-2">Шаг 1: Диагностика</h2>
+                            <p class="text-sm text-purple-700 leading-relaxed">Для начала квеста необходимо заполнить короткую анкету.</p>
+                        </div>
+                        <button onclick="window.open('https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6', '_blank')" 
+                                class="w-full purple-gradient text-white font-bold py-4 rounded-2xl shadow-lg mb-8 active:scale-95 transition-transform">
+                            Заполнить анкету и получить ключ №1
+                        </button>
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №1</label>
+                            <input id="k1" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
+                            <button onclick="handleNext('k1', 1)" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Далее</button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.step === 2) {
+                container.innerHTML = `
+                    <div class="step-transition">
+                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
+                            <h2 class="font-bold text-purple-800 mb-2 text-lg">Шаг 2: Терапия</h2>
+                            <p class="text-sm text-purple-700 leading-relaxed">
+                                Посетите симпозиум: <strong>«Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола Центрис в профилактике инвалидизации»</strong>. Докладчик сообщит вам ключ №2.
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №2</label>
+                            <input id="k2" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
+                            <button onclick="handleNext('k2', 2)" class="w-full purple-gradient text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Далее</button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.step === 3) {
+                container.innerHTML = `
+                    <div class="step-transition">
+                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
+                            <h2 class="font-bold text-purple-800 mb-2 text-lg">Шаг 3: Реабилитация</h2>
+                            <p class="text-sm text-purple-700 leading-relaxed">
+                                Решите ребус на стенде компании <strong>«Nutricia»</strong> и получите ключ №3.
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №3</label>
+                            <input id="k3" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
+                            <button onclick="handleNext('k3', 3)" class="w-full purple-gradient text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Завершить квест</button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.step === 4) {
+                // Финальный экран
+                if (state.isWinner) {
+                    container.innerHTML = `
+                        <div class="text-center step-transition">
+                            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 bg-green-100 text-green-500 rounded-full">
+                                <i class="fa-solid fa-circle-check text-6xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800 mb-4">Поздравляем!</h2>
+                            <p class="text-slate-600 leading-relaxed mb-8">
+                                Мы с вами убедились, что <strong>Nutridrink</strong> улучшает восстановление после инсульта. Покажите этот экран менеджеру на стенде, чтобы получить подарок.
+                            </p>
+                            <button onclick="restart()" class="text-purple-600 font-semibold text-sm underline">Начать сначала</button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center step-transition">
+                            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 bg-purple-100 text-purple-600 rounded-full">
+                                <i class="fa-solid fa-envelope-open-text text-5xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">Спасибо за участие!</h2>
+                            <p class="text-slate-600 leading-relaxed mb-8">
+                                Мы с вами убедились, что <strong>Nutridrink</strong> улучшает восстановление после инсульта. Справочник придет вам на почту, указанную при регистрации, в ближайшее время.
+                            </p>
+                            <button onclick="restart()" class="text-purple-600 font-semibold text-sm underline">Вернуться в начало</button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
         window.onload = init;
     </script>
 </body>
 </html>
-```
