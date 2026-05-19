@@ -2,251 +2,463 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Что помогает улучшить восстановление после инсульта</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Формула Восстановления - Nutricia</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
             background-color: #EEE9F2;
             color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
         }
-        
+
+        .phone-container {
+            background-color: #EEE9F2;
+            width: 100%;
+            max-width: 412px;
+            min-height: 800px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        /* Логотип */
+        .header {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        .logo-main {
+            font-size: 26px;
+            font-weight: bold;
+            color: #51267B;
+            line-height: 1;
+        }
+        .logo-sub {
+            font-size: 14px;
+            color: #51267B;
+            letter-spacing: 1px;
+        }
+
+        /* Прогресс-бар */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .progress-bar-bg {
+            background-color: #FFFEFE;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
         .progress-bar-fill {
             background-color: #A45494;
-            transition: width 0.4s ease-in-out;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
-        .screen-container {
-            animation: fadeIn 0.3s ease-out;
+        /* Контентная часть */
+        .content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        /* Цвета по ТЗ из Figma */
-        .bg-app-purple { background-color: #A45494; }
-        .text-app-white { color: #FFFEFE; }
-        .bg-app-white { background-color: #FFFEFE; }
-        .bg-btn-next { background-color: #DFCBDE; }
+        p {
+            font-size: 16px;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .bold-text {
+            font-weight: bold;
+        }
+
+        .list-instruction {
+            margin-top: 30px;
+            list-style: none;
+        }
+        .list-instruction li {
+            font-size: 16px;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        /* Поля ввода */
+        .input-box {
+            background-color: #FFFEFE;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .code-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px dashed #000;
+            font-size: 16px;
+            text-align: center;
+            padding: 5px;
+            outline: none;
+            background: transparent;
+        }
+        .error-msg {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Кнопки */
+        .btn-container {
+            margin-top: 35px;
+        }
+
+        .btn-action {
+            width: 100%;
+            background-color: #A45494;
+            color: #FFFEFE;
+            border: none;
+            border-radius: 15px;
+            padding: 22px 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-next {
+            width: 100%;
+            background-color: #DFCBDE;
+            color: #000000;
+            border: none;
+            border-radius: 15px;
+            padding: 20px 15px;
+            font-size: 22px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Элементы iframe для бесшовной интеграции анкеты */
+        .iframe-container {
+            display: none;
+            width: 100%;
+            height: 450px;
+            border: none;
+            margin-top: 15px;
+            border-radius: 15px;
+            background: #fff;
+        }
+
+        /* Управление экранами */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased">
+<body>
 
-    <div class="max-w-md w-full mx-auto min-h-screen flex flex-col justify-between p-6 box-border">
-        
-        <div class="w-full mb-6">
-            <div class="w-full bg-app-white h-2.5 rounded-full overflow-hidden p-[1px] shadow-sm">
-                <div id="progress-line" class="progress-bar-fill h-full rounded-full" style="width: 0%"></div>
+<div class="phone-container">
+    
+    <div>
+        <div class="header">
+            <div class="logo-sub">NUTRICIA</div>
+            <div class="logo-main">Nutridrink®</div>
+        </div>
+
+        <div class="progress-container" id="progress-area">
+            <div class="progress-text">
+                <span>Ваш прогресс</span>
+                <span id="progress-val">0%</span>
             </div>
-            <div class="flex justify-between items-center mt-1 px-1">
-                <span class="text-[10px] font-bold tracking-wider text-[#A45494]/80 uppercase">Этапы формулы</span>
-                <span id="progress-text" class="text-[11px] font-bold text-[#A45494]">0%</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="screen active" id="screen-1">
+            <div>
+                <p>Уважаемый коллега!</p>
+                <p class="bold-text" style="font-size: 18px; margin-top: 15px;">Команда Nutricia рада приветствовать вас на конгрессе «Нейрореабилитация 2026».</p>
+                <p style="margin-top: 20px;">Вы точно знаете, что в процессе реабилитации после инсульта важна каждая деталь.</p>
+                <p>Сегодня мы предлагаем вам сыграть в игру и собрать идеальную <span class="bold-text">«Формулу Восстановления»</span> для ваших пациентов.</p>
+                
+                <ul class="list-instruction">
+                    <li><span class="bold-text">Как играть:</span></li>
+                    <li>1. в течение дня выполните <span class="bold-text">три задания</span></li>
+                    <li>2. за каждое выполненное задание получите по одному <span class="bold-text">кодовому слову</span></li>
+                    <li>3. введите кодовые слова и получите <span class="bold-text">подарок на стенде Nutricia</span></li>
+                </ul>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="nextScreen(2)">Далее</button>
             </div>
         </div>
 
-        <main id="app-container" class="flex-1 flex flex-col justify-center">
-            </main>
+        <div class="screen" id="screen-2">
+            <div>
+                <h2 class="bold-text">Задание №1</h2>
+                <p>Пожалуйста, ответьте на несколько вопросов анкеты, чтобы получить первое кодовое слово</p>
+                
+                <button class="btn-action" id="anketa-btn" onclick="openAnketa()">Нажмите для заполнения анкеты</button>
+                
+                <iframe id="anketa-frame" class="iframe-container" src=""></div></iframe>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" id="next-btn-2" disabled onclick="nextScreen(3)">Далее</button>
+            </div>
+        </div>
 
-        <footer class="pt-6 pb-2 text-center">
-            <p class="text-[11px] opacity-40 tracking-wide font-medium">Nutricia &copy; 2026</p>
-        </footer>
+        <div class="screen" id="screen-3">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-1" placeholder="Введите Кодовое слово №1....">
+                    <div class="error-msg" id="error-1">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="validateAndNext(3, 'code-1', 'error-1', 4)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-4">
+            <div>
+                <h2 class="bold-text">Задание №2</h2>
+                <p>Посетите симпозиум</p>
+                <p class="bold-text" style="margin-top: 20px; font-size: 17px;">«Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола «Центрис» в профилактике инвалидизации»</p>
+                <p style="margin-top: 20px;">8 июня (пн)<br><span class="bold-text">16:00-17:30</span><br><span class="bold-text">Зал «Толстой»</span></p>
+                <p style="margin-top: 25px;">Кодовое слово №2 вам подскажут эксперты. Оно появится на одном из финальных слайдов, следите внимательно!</p>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="nextScreen(5)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-5">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-2" placeholder="Введите Кодовое слово №2....">
+                    <div class="error-msg" id="error-2">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="validateAndNext(5, 'code-2', 'error-2', 6)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-6">
+            <div>
+                <h2 class="bold-text">Задание №3</h2>
+                <p class="bold-text">Финишная прямая!</p>
+                <p style="margin-top: 20px;">Загляните на стенд Nutricia в выставочной зоне и разгадайте экспресс-ребус. Он зашифровывает финальную цель любой реабилитации.</p>
+                <p style="margin-top: 20px;">Это и будет Кодовое слово №3</p>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="nextScreen(7)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-7">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-3" placeholder="Введите Кодовое слово №3....">
+                    <div class="error-msg" id="error-3">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="checkFinalResult()">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-8">
+            <div>
+                <h2 class="bold-text">Поздравляем!</h2>
+                <p>Вы верно собрали формулу:</p>
+                <p class="bold-text" style="font-size: 18px; margin: 20px 0;">«Nutridrink улучшает восстановление».</p>
+                <p>Покажите этот экран нашему сотруднику на стенде прямо сейчас и заберите ваш заслуженный подарок.</p>
+                <p style="margin-top: 25px;" class="bold-text">Спасибо за ваш труд и активное участие!</p>
+            </div>
+            <div></div> </div>
+
+        <div class="screen" id="screen-9">
+            <div>
+                <h2 class="bold-text">Формула требует точности!</h2>
+                <p>Похоже, один из элементов формулы был введен неверно. Но в медицине важен каждый опыт!</p>
+                <p style="margin-top: 20px;">Чтобы ваша клиническая практика всегда опиралась на точные данные, мы подготовили для вас <span class="bold-text">Полный электронный справочник по продуктам Nutricia</span>.</p>
+                <p style="margin-top: 20px;" class="bold-text">Обратите внимание:</p>
+                <p>• Ссылка на справочник будет отправлена на email, который вы указали в анкете.</p>
+                <p style="margin-top: 25px;" class="bold-text">Спасибо, что провели этот день с Nutricia!</p>
+            </div>
+            <div></div> </div>
+
     </div>
+</div>
 
-    <script>
-        const CONFIG = {
-            keys: {
-                1: "nutridrink",
-                2: "улучшает",
-                3: "восстановление"
-            },
-            storageKey: 'nutricia_quest_persistent_v4'
-        };
+<script>
+    // Правильные ответы
+    const CORRECT_WORDS = {
+        w1: "nutridrink",
+        w2: "улучшает",
+        w3: "восстановление"
+    };
 
-        let state = {
-            step: 1,
-            answers: { 1: '', 2: '', 3: '' }
-        };
+    // Процент шкалы прогресса для каждого экрана
+    const PROGRESS_MAP = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 33,
+        5: 33,
+        6: 66,
+        7: 66,
+        8: 110,
+        9: 110
+    };
 
-        function init() {
-            const saved = localStorage.getItem(CONFIG.storageKey);
-            if (saved) {
-                try {
-                    state = JSON.parse(saved);
-                } catch (e) {
-                    localStorage.removeItem(CONFIG.storageKey);
-                }
-            }
-            render();
+    // Инициализация при загрузке страницы
+    window.onload = function() {
+        loadProgress();
+    };
+
+    // Переключение экранов
+    function nextScreen(screenNum) {
+        // Прячем все экраны
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        
+        // Показываем нужный экран
+        const targetScreen = document.getElementById(`screen-${screenNum}`);
+        if(targetScreen) {
+            targetScreen.classList.add('active');
         }
 
-        function save() {
-            localStorage.setItem(CONFIG.storageKey, JSON.stringify(state));
+        // Обновляем прогресс-бар
+        updateProgressBar(screenNum);
+
+        // Сохраняем состояние в LocalStorage
+        localStorage.setItem('nutricia_current_screen', screenNum);
+    }
+
+    // Обновление прогресс-бара
+    function updateProgressBar(screenNum) {
+        const progressArea = document.getElementById('progress-area');
+        
+        // Скрываем плашку прогресса на финальных экранах, если это необходимо по дизайну, 
+        // но так как на скринах написано 110%, оставляем отображение
+        const percentage = PROGRESS_MAP[screenNum] || 0;
+        document.getElementById('progress-val').innerText = percentage + '%';
+        document.getElementById('progress-bar').style.width = percentage + '%';
+    }
+
+    // Интеграция Яндекс.Формы без перехода на другую вкладку
+    function openAnketa() {
+        const iframe = document.getElementById('anketa-frame');
+        const btnNext = document.getElementById('next-btn-2');
+        const btnAnketa = document.getElementById('anketa-btn');
+        
+        // Указываем ссылку на форму
+        iframe.src = "https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6/";
+        iframe.style.display = "block"; // Показываем фрейм
+        
+        // Прячем или уменьшаем кнопку вызова анкеты, чтобы освободить место
+        btnAnketa.style.display = "none";
+        
+        // Автоматически активируем кнопку "Далее"
+        btnNext.removeAttribute('disabled');
+        
+        // Сохраняем флаг, что анкета открывалась
+        localStorage.setItem('nutricia_anketa_opened', 'true');
+    }
+
+    // Валидация полей ввода кодовых слов
+    function validateAndNext(currentScreen, inputId, errorId, nextScreenNum) {
+        const inputVal = document.getElementById(inputId).value.trim();
+        const errorEl = document.getElementById(errorId);
+
+        if (inputVal === "") {
+            errorEl.style.display = "block";
+        } else {
+            errorEl.style.display = "none";
+            // Сохраняем введенное слово пользователя
+            localStorage.setItem(`nutricia_user_${inputId}`, inputVal);
+            nextScreen(nextScreenNum);
         }
+    }
 
-        function handleNext(inputId, stepNum) {
-            const input = document.getElementById(inputId);
-            const value = input ? input.value.trim().toLowerCase() : '';
-            
-            state.answers[stepNum] = value;
-            state.step++;
-            save();
-            render();
+    // Финальная проверка результатов
+    function checkFinalResult() {
+        const inputVal3 = document.getElementById('code-3').value.trim();
+        const errorEl3 = document.getElementById('error-3');
+
+        if (inputVal3 === "") {
+            errorEl3.style.display = "block";
+            return;
         }
+        errorEl3.style.display = "none";
+        localStorage.setItem('nutricia_user_code-3', inputVal3);
 
-        function checkIsWinner() {
-            return (
-                state.answers[1].toLowerCase() === CONFIG.keys[1].toLowerCase() &&
-                state.answers[2].toLowerCase() === CONFIG.keys[2].toLowerCase() &&
-                state.answers[3].toLowerCase() === CONFIG.keys[3].toLowerCase()
-            );
+        // Считываем все сохраненные ответы
+        const ans1 = (localStorage.getItem('nutricia_user_code-1') || "").toLowerCase();
+        const ans2 = (localStorage.getItem('nutricia_user_code-2') || "").toLowerCase();
+        const ans3 = inputVal3.toLowerCase();
+
+        // Проверка на полное совпадение
+        if (ans1 === CORRECT_WORDS.w1 && ans2 === CORRECT_WORDS.w2 && ans3 === CORRECT_WORDS.w3) {
+            nextScreen(8); // Экран Успеха
+        } else {
+            nextScreen(9); // Экран Ошибки
         }
+    }
 
-        function restart() {
-            localStorage.removeItem(CONFIG.storageKey);
-            state = { step: 1, answers: { 1: '', 2: '', 3: '' } };
-            render();
-        }
+    // Загрузка сохраненного прогресса пользователя из памяти браузера
+    function loadProgress() {
+        const savedScreen = localStorage.getItem('nutricia_current_screen');
+        const anketaOpened = localStorage.getItem('nutricia_anketa_opened');
+        
+        // Восстанавливаем ответы в полях, если они были введены ранее
+        if(localStorage.getItem('nutricia_user_code-1')) document.getElementById('code-1').value = localStorage.getItem('nutricia_user_code-1');
+        if(localStorage.getItem('nutricia_user_code-2')) document.getElementById('code-2').value = localStorage.getItem('nutricia_user_code-2');
+        if(localStorage.getItem('nutricia_user_code-3')) document.getElementById('code-3').value = localStorage.getItem('nutricia_user_code-3');
 
-        function updateProgress() {
-            const percent = ((state.step - 1) / 3) * 100;
-            document.getElementById('progress-line').style.width = `${percent}%`;
-            document.getElementById('progress-text').innerText = `${Math.round(percent)}%`;
-        }
-
-        function scrollToInput(id) {
-            const el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function render() {
-            const container = document.getElementById('app-container');
-            updateProgress();
-
-            if (state.step === 1) {
-                container.innerHTML = `
-                    <div class="screen-container flex flex-col text-center">
-                        <h1 class="text-xl font-bold mb-6 px-2 leading-snug">
-                            Что помогает улучшить восстановление после инсульта
-                        </h1>
-                        
-                        <p class="text-sm opacity-80 mb-6 px-4">
-                            Добро пожаловать в интерактивный квест! Пройдите все этапы, соберите ключевые элементы формулы восстановления.
-                        </p>
-
-                        <button onclick="window.open('https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6/', '_blank')" 
-                                class="w-full bg-app-purple text-app-white font-semibold py-4 px-6 rounded-2xl shadow-md transition-transform active:scale-[0.99] text-sm">
-                            Нажмите для заполнения анкеты
-                        </button>
-
-                        <button onclick="scrollToInput('k1')" 
-                                class="w-full mt-2 text-[#A45494] font-medium py-2 rounded-xl text-xs bg-app-white/40 border border-dashed border-[#A45494]/30 active:opacity-80">
-                            ← Я заполнил анкету (вернуться к квесту)
-                        </button>
-
-                        <div class="text-left space-y-2 mt-8 pt-4 border-t border-[#DFCBDE]">
-                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №1</label>
-                            <input id="k1" type="text" placeholder="Введите первый ключ..." 
-                                   value="${state.answers[1] || ''}"
-                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
-                            
-                            <button onclick="handleNext('k1', 1)" 
-                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
-                                Далее
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (state.step === 2) {
-                container.innerHTML = `
-                    <div class="screen-container flex flex-col text-left">
-                        <div class="bg-app-white/60 border border-[#DFCBDE] p-5 rounded-2xl mb-6">
-                            <h2 class="font-bold mb-2 text-base text-[#A45494]">Шаг 2: Терапия</h2>
-                            <p class="text-sm leading-relaxed opacity-90">
-                                Посетите симпозиум: <strong>«Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола Центрис в профилактике инвалидизации»</strong>. Докладчик сообщит вам ключ №2.
-                            </p>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №2</label>
-                            <input id="k2" type="text" placeholder="Введите второе слово..." 
-                                   value="${state.answers[2] || ''}"
-                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
-                            
-                            <button onclick="handleNext('k2', 2)" 
-                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
-                                Далее
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (state.step === 3) {
-                container.innerHTML = `
-                    <div class="screen-container flex flex-col text-left">
-                        <div class="bg-app-white/60 border border-[#DFCBDE] p-5 rounded-2xl mb-6">
-                            <h2 class="font-bold mb-2 text-base text-[#A45494]">Шаг 3: Реабилитация</h2>
-                            <p class="text-sm leading-relaxed opacity-90">
-                                Решите ребус на стенде компании <strong>«Nutricia»</strong> и получите ключ №3.
-                            </p>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №3</label>
-                            <input id="k3" type="text" placeholder="Введите финальное слово..." 
-                                   value="${state.answers[3] || ''}"
-                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
-                            
-                            <button onclick="handleNext('k3', 3)" 
-                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
-                                Далее
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (state.step === 4) {
-                if (checkIsWinner()) {
-                    container.innerHTML = `
-                        <div class="screen-container text-center py-4">
-                            <h2 class="text-2xl font-bold text-[#A45494] mb-4">Поздравляем!</h2>
-                            <p class="text-base font-medium leading-relaxed mb-6 px-2">
-                                Вы верно собрали формулу:<br>
-                                <span class="text-lg font-bold text-black block mt-2">«Nutridrink улучшает восстановление».</span>
-                            </p>
-                            <p class="text-sm leading-relaxed opacity-90 mb-8 px-4">
-                                Покажите этот экран нашему сотруднику на стенде прямо сейчас и заберите ваш заслуженный подарок.<br><br>
-                                <em>Спасибо за ваш труд и активное участие!</em>
-                            </p>
-                            <button onclick="restart()" class="text-xs font-bold uppercase tracking-wider text-[#A45494] hover:opacity-80 underline underline-offset-4 decoration-2">
-                                Начать сначала
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div class="screen-container text-center py-4">
-                            <h2 class="text-xl font-bold text-black mb-4">Формула требует точности!</h2>
-                            <p class="text-sm leading-relaxed opacity-90 mb-6 px-2">
-                                Похоже, один из элементов формулы был введен неверно. Но в медицине важен каждый опыт!
-                            </p>
-                            <div class="bg-app-white/80 border border-[#DFCBDE] p-4 rounded-xl text-left text-xs mb-6 space-y-2">
-                                <p class="font-semibold text-black">Чтобы ваша клиническая практика всегда опиралась на точные данные, мы подготовили для вас Полный электронный справочник по продуктам Nutricia.</p>
-                                <p class="opacity-80"><strong class="text-[#A45494]">Обратите внимание:</strong> Ссылка на справочник будет отправлена на email, который вы указали в анкете.</p>
-                            </div>
-                            <p class="text-sm italic font-medium mb-8">Спасибо, что провели этот день с Nutricia!</p>
-                            <button onclick="restart()" class="text-xs font-bold uppercase tracking-wider text-[#A45494] hover:opacity-80 underline underline-offset-4 decoration-2">
-                                Вернуться в начало
-                            </button>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        window.onload = init;
-    </script>
-</body>
-</html>
+        if (anketaOpened === 'true') {
