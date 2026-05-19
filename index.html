@@ -26,7 +26,7 @@
             background-color: #EEE9F2;
             width: 100%;
             max-width: 412px;
-            min-height: 800px;
+            min-height: 750px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -34,7 +34,7 @@
             position: relative;
         }
 
-        /* Логотип */
+        /* Шапка игры */
         .header {
             text-align: left;
             margin-bottom: 25px;
@@ -74,7 +74,7 @@
             transition: width 0.3s ease;
         }
 
-        /* Контентная часть */
+        /* Контентная зона */
         .content {
             flex-grow: 1;
             display: flex;
@@ -99,16 +99,15 @@
         }
 
         .list-instruction {
-            margin-top: 30px;
+            margin-top: 25px;
             list-style: none;
         }
         .list-instruction li {
-            font-size: 16px;
+            font-size: 15px;
             margin-bottom: 8px;
-            padding-left: 5px;
         }
 
-        /* Поля ввода */
+        /* Поля ввода (Инпуты) */
         .input-box {
             background-color: #FFFEFE;
             border-radius: 15px;
@@ -120,21 +119,23 @@
         .code-input {
             width: 100%;
             border: none;
-            border-bottom: 1px dashed #000;
-            font-size: 16px;
+            border-bottom: 2px dashed #A45494;
+            font-size: 18px;
             text-align: center;
-            padding: 5px;
+            padding: 8px;
             outline: none;
             background: transparent;
+            color: #000000;
         }
         .error-msg {
             color: #d93025;
             font-size: 14px;
-            margin-top: 10px;
+            margin-top: 12px;
             display: none;
+            font-weight: bold;
         }
 
-        /* Кнопки */
+        /* Стилизация Кнопок */
         .btn-container {
             margin-top: 35px;
         }
@@ -153,6 +154,8 @@
             margin-bottom: 15px;
             line-height: 1.2;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: block;
+            text-decoration: none;
         }
 
         .btn-next {
@@ -165,6 +168,7 @@
             font-size: 22px;
             cursor: pointer;
             text-align: center;
+            font-weight: 500;
         }
 
         .btn-next:disabled {
@@ -172,18 +176,7 @@
             cursor: not-allowed;
         }
 
-        /* Элементы iframe для бесшовной интеграции анкеты */
-        .iframe-container {
-            display: none;
-            width: 100%;
-            height: 450px;
-            border: none;
-            margin-top: 15px;
-            border-radius: 15px;
-            background: #fff;
-        }
-
-        /* Управление экранами */
+        /* Системные классы управления экранами */
         .screen {
             display: none;
         }
@@ -205,7 +198,7 @@
             <div class="logo-main">Nutridrink®</div>
         </div>
 
-        <div class="progress-container" id="progress-area">
+        <div class="progress-container">
             <div class="progress-text">
                 <span>Ваш прогресс</span>
                 <span id="progress-val">0%</span>
@@ -218,12 +211,12 @@
 
     <div class="content">
 
-        <div class="screen active" id="screen-1">
+        <div class="screen" id="screen-1">
             <div>
                 <p>Уважаемый коллега!</p>
                 <p class="bold-text" style="font-size: 18px; margin-top: 15px;">Команда Nutricia рада приветствовать вас на конгрессе «Нейрореабилитация 2026».</p>
                 <p style="margin-top: 20px;">Вы точно знаете, что в процессе реабилитации после инсульта важна каждая деталь.</p>
-                <p>Today мы предлагаем вам сыграть в игру и собрать идеальную <span class="bold-text">«Формулу Восстановления»</span> для ваших пациентов.</p>
+                <p>Сегодня мы предлагаем вам сыграть в игру и собрать идеальную <span class="bold-text">«Формулу Восстановления»</span> для ваших пациентов.</p>
                 
                 <ul class="list-instruction">
                     <li><span class="bold-text">Как играть:</span></li>
@@ -240,4 +233,236 @@
         <div class="screen" id="screen-2">
             <div>
                 <h2 class="bold-text">Задание №1</h2>
-                <p>Пожалуйста, ответьте
+                <p>Пожалуйста, ответьте на несколько вопросов анкеты, чтобы получить первое кодовое слово</p>
+                
+                <a href="https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6/" target="_blank" class="btn-action" id="anketa-btn" onclick="handleAnketaClick()">Нажмите для заполнения анкеты</a>
+                
+                <button class="btn-action" id="anketa-done-btn" style="display: none; background-color: #51267B;" onclick="nextScreen(3)">Я заполнил(а) анкету →</button>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" id="next-btn-2" disabled onclick="nextScreen(3)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-3">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-1" placeholder="Введите Кодовое слово №1....">
+                    <div class="error-msg" id="error-1">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="validateAndNext('code-1', 'error-1', 4)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-4">
+            <div>
+                <h2 class="bold-text">Задание №2</h2>
+                <p>Посетите симпозиум</p>
+                <p class="bold-text" style="margin-top: 20px; font-size: 17px;">«Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола «Центрис» в профилактике инвалидизации»</p>
+                <p style="margin-top: 20px;">8 июня (пн)<br><span class="bold-text">16:00-17:30</span><br><span class="bold-text">Зал «Толстой»</span></p>
+                <p style="margin-top: 25px;">Кодовое слово №2 вам подскажут эксперты. Оно появится на одном из финальных слайдов, следите внимательно!</p>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="nextScreen(5)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-5">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-2" placeholder="Введите Кодовое слово №2....">
+                    <div class="error-msg" id="error-2">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="validateAndNext('code-2', 'error-2', 6)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-6">
+            <div>
+                <h2 class="bold-text">Задание №3</h2>
+                <p class="bold-text">Финишная прямая!</p>
+                <p style="margin-top: 20px;">Загляните на стенд Nutricia в выставочной зоне и разгадайте экспресс-ребус. Он зашифровывает финальную цель любой реабилитации.</p>
+                <p style="margin-top: 20px;">Это и будет Кодовое слово №3</p>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="nextScreen(7)">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-7">
+            <div>
+                <div class="input-box">
+                    <input type="text" class="code-input" id="code-3" placeholder="Введите Кодовое слово №3....">
+                    <div class="error-msg" id="error-3">Пожалуйста, введите кодовое слово</div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn-next" onclick="checkFinalResult()">Далее</button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-8">
+            <div>
+                <h2 class="bold-text" style="color: #51267B;">Поздравляем!</h2>
+                <p>Вы верно собрали формулу:</p>
+                <p class="bold-text" style="font-size: 18px; margin: 20px 0; color: #A45494;">«Nutridrink улучшает восстановление».</p>
+                <p>Покажите этот экран нашему сотруднику на стенде прямо сейчас и заберите ваш заслуженный подарок.</p>
+                <p style="margin-top: 25px;" class="bold-text">Спасибо за ваш труд и активное участие!</p>
+            </div>
+            <div></div> 
+        </div>
+
+        <div class="screen" id="screen-9">
+            <div>
+                <h2 class="bold-text">Формула требует точности!</h2>
+                <p>Похоже, один из элементов формулы был введен неверно. Но в медицине важен каждый опыт!</p>
+                <p style="margin-top: 20px;">Чтобы ваша клиническая практика всегда опиралась на точные данные, мы подготовили для вас <span class="bold-text">Полный электронный справочник по продуктам Nutricia</span>.</p>
+                <p style="margin-top: 20px;" class="bold-text">Обратите внимание:</p>
+                <p>• Ссылка на справочник будет отправлена на email, который вы указали в анкете.</p>
+                <p style="margin-top: 25px;" class="bold-text">Спасибо, что провели этот день с Nutricia!</p>
+            </div>
+            <div></div> 
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Правильные ответы эталоны (в нижнем регистре)
+    const CORRECT_WORDS = {
+        w1: "nutridrink",
+        w2: "улучшает",
+        w3: "восстановление"
+    };
+
+    // Прогресс для каждого экрана
+    const PROGRESS_MAP = {
+        1: 0, 2: 0, 3: 0,
+        4: 33, 5: 33,
+        6: 66, 7: 66,
+        8: 100, 9: 100
+    };
+
+    // Основная функция переключения экранов
+    function nextScreen(screenNum) {
+        // Скрываем все экраны
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+        
+        // Показываем текущий
+        const targetScreen = document.getElementById(`screen-${screenNum}`);
+        if(targetScreen) {
+            targetScreen.classList.add('active');
+        }
+
+        // Обновляем прогресс
+        updateProgressBar(screenNum);
+        
+        // Запоминаем шаг
+        localStorage.setItem('nutricia_current_screen', screenNum);
+    }
+
+    // Обновление прогресс-бара
+    function updateProgressBar(screenNum) {
+        const progressVal = document.getElementById('progress-val');
+        const progressBar = document.getElementById('progress-bar');
+        
+        if (progressVal && progressBar) {
+            const percentage = PROGRESS_MAP[screenNum] || 0;
+            progressVal.innerText = percentage + '%';
+            progressBar.style.width = percentage + '%';
+        }
+    }
+
+    // Логика нажатия на анкету
+    function handleAnketaClick() {
+        localStorage.setItem('nutricia_anketa_opened', 'true');
+        
+        // Разблокируем кнопку "Далее" и показываем вспомогательную кнопку перехода
+        const btnNext = document.getElementById('next-btn-2');
+        const btnDone = document.getElementById('anketa-done-btn');
+        
+        if(btnNext) btnNext.removeAttribute('disabled');
+        if(btnDone) btnDone.style.display = "block";
+    }
+
+    // Проверка пустых полей
+    function validateAndNext(inputId, errorId, nextScreenNum) {
+        const inputEl = document.getElementById(inputId);
+        const errorEl = document.getElementById(errorId);
+        
+        if(!inputEl || !errorEl) return;
+
+        const inputVal = inputEl.value.trim();
+
+        if (inputVal === "") {
+            errorEl.style.display = "block";
+        } else {
+            errorEl.style.display = "none";
+            localStorage.setItem(`nutricia_user_${inputId}`, inputVal);
+            nextScreen(nextScreenNum);
+        }
+    }
+
+    // Финальный расчет результатов игры
+    function checkFinalResult() {
+        const inputEl3 = document.getElementById('code-3');
+        const errorEl3 = document.getElementById('error-3');
+        
+        if(!inputEl3 || !errorEl3) return;
+
+        const inputVal3 = inputEl3.value.trim();
+
+        if (inputVal3 === "") {
+            errorEl3.style.display = "block";
+            return;
+        }
+        errorEl3.style.display = "none";
+        localStorage.setItem('nutricia_user_code-3', inputVal3);
+
+        // Получаем все сохраненные ответы
+        const ans1 = (localStorage.getItem('nutricia_user_code-1') || "").toLowerCase().trim();
+        const ans2 = (localStorage.getItem('nutricia_user_code-2') || "").toLowerCase().trim();
+        const ans3 = inputVal3.toLowerCase().trim();
+
+        // Проверяем правильность формулы
+        if (ans1 === CORRECT_WORDS.w1 && ans2 === CORRECT_WORDS.w2 && ans3 === CORRECT_WORDS.w3) {
+            nextScreen(8); // Экран Успеха
+        } else {
+            nextScreen(9); // Экран Ошибки
+        }
+    }
+
+    // Проверка сохраненных данных при входе в игру
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedScreen = localStorage.getItem('nutricia_current_screen');
+        const anketaOpened = localStorage.getItem('nutricia_anketa_opened');
+        
+        // Заполняем поля, если они уже были введены
+        if(localStorage.getItem('nutricia_user_code-1')) document.getElementById('code-1').value = localStorage.getItem('nutricia_user_code-1');
+        if(localStorage.getItem('nutricia_user_code-2')) document.getElementById('code-2').value = localStorage.getItem('nutricia_user_code-2');
+        if(localStorage.getItem('nutricia_user_code-3')) document.getElementById('code-3').value = localStorage.getItem('nutricia_user_code-3');
+
+        // Проверяем, нажимал ли пользователь анкету ранее
+        if (anketaOpened === 'true') {
+            const btnNext = document.getElementById('next-btn-2');
+            const btnDone = document.getElementById('anketa-done-btn');
+            if(btnNext) btnNext.removeAttribute('disabled');
+            if(btnDone) btnDone.style.display = "block";
+        }
+
+        // Запускаем нужный экран
+        if (savedScreen) {
+            nextScreen(parseInt(savedScreen));
+        } else {
+            nextScreen(1);
+        }
+    });
+</script>
+
+</body>
+</html>
