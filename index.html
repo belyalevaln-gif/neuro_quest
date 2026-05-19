@@ -5,57 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Что помогает улучшить восстановление после инсульта</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        :root {
-            --primary-purple: #6D28D9;
-            --light-purple: #F5F3FF;
-        }
-        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fcfcfd;
+            background-color: #EEE9F2;
+            color: #000000;
         }
         
-        .progress-bar {
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .progress-bar-fill {
+            background-color: #A45494;
+            transition: width 0.4s ease-in-out;
         }
 
-        .step-transition {
-            animation: fadeIn 0.4s ease-out;
+        .screen-container {
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .purple-gradient {
-            background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
-        }
+        /* Цвета по ТЗ из Figma */
+        .bg-app-purple { background-color: #A45494; }
+        .text-app-white { color: #FFFEFE; }
+        .bg-app-white { background-color: #FFFEFE; }
+        .bg-btn-next { background-color: #DFCBDE; }
     </style>
 </head>
-<body class="min-h-screen">
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl flex flex-col">
-        <!-- Progress Header -->
-        <div class="sticky top-0 z-50 bg-white border-b border-purple-100">
-            <div class="p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400">Прогресс квеста</span>
-                    <span id="progress-text" class="text-xs font-bold text-purple-700">0%</span>
-                </div>
-                <div class="w-full bg-purple-100 h-2 rounded-full overflow-hidden">
-                    <div id="progress-line" class="progress-bar h-full purple-gradient" style="width: 0%"></div>
-                </div>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <div class="max-w-md w-full mx-auto min-h-screen flex flex-col justify-between p-6 box-border">
+        
+        <div class="w-full mb-6">
+            <div class="w-full bg-app-white h-2.5 rounded-full overflow-hidden p-[1px] shadow-sm">
+                <div id="progress-line" class="progress-bar-fill h-full rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center mt-1 px-1">
+                <span class="text-[10px] font-bold tracking-wider text-[#A45494]/80 uppercase">Этапы формулы</span>
+                <span id="progress-text" class="text-[11px] font-bold text-[#A45494]">0%</span>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <main id="app-container" class="flex-1 p-6 flex flex-col justify-center">
-            <!-- Content injected by JS -->
-        </main>
+        <main id="app-container" class="flex-1 flex flex-col justify-center">
+            </main>
+
+        <footer class="pt-6 pb-2 text-center">
+            <p class="text-[11px] opacity-40 tracking-wide font-medium">Nutricia &copy; 2026</p>
+        </footer>
     </div>
 
     <script>
@@ -65,20 +64,22 @@
                 2: "улучшает",
                 3: "восстановление"
             },
-            storageKey: 'med_quest_data'
+            storageKey: 'nutricia_quest_persistent_v4'
         };
 
         let state = {
             step: 1,
-            answers: { 1: null, 2: null, 3: null },
-            isWinner: true
+            answers: { 1: '', 2: '', 3: '' }
         };
 
-        // Инициализация
         function init() {
             const saved = localStorage.getItem(CONFIG.storageKey);
             if (saved) {
-                state = JSON.parse(saved);
+                try {
+                    state = JSON.parse(saved);
+                } catch (e) {
+                    localStorage.removeItem(CONFIG.storageKey);
+                }
             }
             render();
         }
@@ -89,114 +90,156 @@
 
         function handleNext(inputId, stepNum) {
             const input = document.getElementById(inputId);
-            const value = input.value.trim().toLowerCase();
+            const value = input ? input.value.trim().toLowerCase() : '';
             
-            // Сохраняем ответ
             state.answers[stepNum] = value;
-            
-            // Если хоть один ответ неверный — флаг победителя сбрасывается
-            if (value !== CONFIG.keys[stepNum].toLowerCase()) {
-                state.isWinner = false;
-            }
-
             state.step++;
             save();
             render();
         }
 
+        function checkIsWinner() {
+            return (
+                state.answers[1].toLowerCase() === CONFIG.keys[1].toLowerCase() &&
+                state.answers[2].toLowerCase() === CONFIG.keys[2].toLowerCase() &&
+                state.answers[3].toLowerCase() === CONFIG.keys[3].toLowerCase()
+            );
+        }
+
         function restart() {
             localStorage.removeItem(CONFIG.storageKey);
-            state = { step: 1, answers: { 1: null, 2: null, 3: null }, isWinner: true };
+            state = { step: 1, answers: { 1: '', 2: '', 3: '' } };
             render();
         }
 
-        function updateUI() {
+        function updateProgress() {
             const percent = ((state.step - 1) / 3) * 100;
             document.getElementById('progress-line').style.width = `${percent}%`;
             document.getElementById('progress-text').innerText = `${Math.round(percent)}%`;
         }
 
+        function scrollToInput(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         function render() {
             const container = document.getElementById('app-container');
-            updateUI();
+            updateProgress();
 
             if (state.step === 1) {
                 container.innerHTML = `
-                    <div class="step-transition">
-                        <h1 class="text-2xl font-bold text-slate-800 mb-6 text-center">Что помогает улучшить восстановление после инсульта</h1>
-                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
-                            <h2 class="font-bold text-purple-800 mb-2">Шаг 1: Диагностика</h2>
-                            <p class="text-sm text-purple-700 leading-relaxed">Для начала квеста необходимо заполнить короткую анкету.</p>
-                        </div>
-                        <button onclick="window.open('https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6', '_blank')" 
-                                class="w-full purple-gradient text-white font-bold py-4 rounded-2xl shadow-lg mb-8 active:scale-95 transition-transform">
-                            Заполнить анкету и получить ключ №1
+                    <div class="screen-container flex flex-col text-center">
+                        <h1 class="text-xl font-bold mb-6 px-2 leading-snug">
+                            Что помогает улучшить восстановление после инсульта
+                        </h1>
+                        
+                        <p class="text-sm opacity-80 mb-6 px-4">
+                            Добро пожаловать в интерактивный квест! Пройдите все этапы, соберите ключевые элементы формулы восстановления.
+                        </p>
+
+                        <button onclick="window.open('https://forms.yandex.ru/cloud/69f8599584227c6ee20006a6/', '_blank')" 
+                                class="w-full bg-app-purple text-app-white font-semibold py-4 px-6 rounded-2xl shadow-md transition-transform active:scale-[0.99] text-sm">
+                            Нажмите для заполнения анкеты
                         </button>
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №1</label>
-                            <input id="k1" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
-                            <button onclick="handleNext('k1', 1)" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Далее</button>
+
+                        <button onclick="scrollToInput('k1')" 
+                                class="w-full mt-2 text-[#A45494] font-medium py-2 rounded-xl text-xs bg-app-white/40 border border-dashed border-[#A45494]/30 active:opacity-80">
+                            ← Я заполнил анкету (вернуться к квесту)
+                        </button>
+
+                        <div class="text-left space-y-2 mt-8 pt-4 border-t border-[#DFCBDE]">
+                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №1</label>
+                            <input id="k1" type="text" placeholder="Введите первый ключ..." 
+                                   value="${state.answers[1] || ''}"
+                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
+                            
+                            <button onclick="handleNext('k1', 1)" 
+                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
+                                Далее
+                            </button>
                         </div>
                     </div>
                 `;
             } else if (state.step === 2) {
                 container.innerHTML = `
-                    <div class="step-transition">
-                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
-                            <h2 class="font-bold text-purple-800 mb-2 text-lg">Шаг 2: Терапия</h2>
-                            <p class="text-sm text-purple-700 leading-relaxed">
+                    <div class="screen-container flex flex-col text-left">
+                        <div class="bg-app-white/60 border border-[#DFCBDE] p-5 rounded-2xl mb-6">
+                            <h2 class="font-bold mb-2 text-base text-[#A45494]">Шаг 2: Терапия</h2>
+                            <p class="text-sm leading-relaxed opacity-90">
                                 Посетите симпозиум: <strong>«Трансформация подходов к реабилитации после инсульта: клиническая ценность протокола Центрис в профилактике инвалидизации»</strong>. Докладчик сообщит вам ключ №2.
                             </p>
                         </div>
+
                         <div class="space-y-2">
-                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №2</label>
-                            <input id="k2" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
-                            <button onclick="handleNext('k2', 2)" class="w-full purple-gradient text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Далее</button>
+                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №2</label>
+                            <input id="k2" type="text" placeholder="Введите второе слово..." 
+                                   value="${state.answers[2] || ''}"
+                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
+                            
+                            <button onclick="handleNext('k2', 2)" 
+                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
+                                Далее
+                            </button>
                         </div>
                     </div>
                 `;
             } else if (state.step === 3) {
                 container.innerHTML = `
-                    <div class="step-transition">
-                        <div class="bg-purple-50 p-6 rounded-3xl mb-8 border border-purple-100">
-                            <h2 class="font-bold text-purple-800 mb-2 text-lg">Шаг 3: Реабилитация</h2>
-                            <p class="text-sm text-purple-700 leading-relaxed">
+                    <div class="screen-container flex flex-col text-left">
+                        <div class="bg-app-white/60 border border-[#DFCBDE] p-5 rounded-2xl mb-6">
+                            <h2 class="font-bold mb-2 text-base text-[#A45494]">Шаг 3: Реабилитация</h2>
+                            <p class="text-sm leading-relaxed opacity-90">
                                 Решите ребус на стенде компании <strong>«Nutricia»</strong> и получите ключ №3.
                             </p>
                         </div>
+
                         <div class="space-y-2">
-                            <label class="text-xs font-semibold text-slate-400 ml-1">КЛЮЧ №3</label>
-                            <input id="k3" type="text" placeholder="Введите слово..." class="w-full border-2 border-purple-100 rounded-2xl p-4 focus:border-purple-500 outline-none transition-colors">
-                            <button onclick="handleNext('k3', 3)" class="w-full purple-gradient text-white font-bold py-4 rounded-2xl mt-2 active:scale-95 transition-transform">Завершить квест</button>
+                            <label class="text-xs font-bold uppercase tracking-wider opacity-60 ml-1">Кодовое слово №3</label>
+                            <input id="k3" type="text" placeholder="Введите финальное слово..." 
+                                   value="${state.answers[3] || ''}"
+                                   class="w-full bg-app-white border border-[#DFCBDE] rounded-xl p-4 outline-none focus:border-[#A45494] transition-colors text-base placeholder:text-neutral-300">
+                            
+                            <button onclick="handleNext('k3', 3)" 
+                                    class="w-full bg-btn-next text-black font-bold py-4 rounded-xl mt-4 shadow-sm transition-transform active:scale-[0.99]">
+                                Далее
+                            </button>
                         </div>
                     </div>
                 `;
             } else if (state.step === 4) {
-                // Финальный экран
-                if (state.isWinner) {
+                if (checkIsWinner()) {
                     container.innerHTML = `
-                        <div class="text-center step-transition">
-                            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 bg-green-100 text-green-500 rounded-full">
-                                <i class="fa-solid fa-circle-check text-6xl"></i>
-                            </div>
-                            <h2 class="text-2xl font-bold text-slate-800 mb-4">Поздравляем!</h2>
-                            <p class="text-slate-600 leading-relaxed mb-8">
-                                Мы с вами убедились, что <strong>Nutridrink</strong> улучшает восстановление после инсульта. Покажите этот экран менеджеру на стенде, чтобы получить подарок.
+                        <div class="screen-container text-center py-4">
+                            <h2 class="text-2xl font-bold text-[#A45494] mb-4">Поздравляем!</h2>
+                            <p class="text-base font-medium leading-relaxed mb-6 px-2">
+                                Вы верно собрали формулу:<br>
+                                <span class="text-lg font-bold text-black block mt-2">«Nutridrink улучшает восстановление».</span>
                             </p>
-                            <button onclick="restart()" class="text-purple-600 font-semibold text-sm underline">Начать сначала</button>
+                            <p class="text-sm leading-relaxed opacity-90 mb-8 px-4">
+                                Покажите этот экран нашему сотруднику на стенде прямо сейчас и заберите ваш заслуженный подарок.<br><br>
+                                <em>Спасибо за ваш труд и активное участие!</em>
+                            </p>
+                            <button onclick="restart()" class="text-xs font-bold uppercase tracking-wider text-[#A45494] hover:opacity-80 underline underline-offset-4 decoration-2">
+                                Начать сначала
+                            </button>
                         </div>
                     `;
                 } else {
                     container.innerHTML = `
-                        <div class="text-center step-transition">
-                            <div class="mb-6 inline-flex items-center justify-center w-24 h-24 bg-purple-100 text-purple-600 rounded-full">
-                                <i class="fa-solid fa-envelope-open-text text-5xl"></i>
-                            </div>
-                            <h2 class="text-xl font-bold text-slate-800 mb-4">Спасибо за участие!</h2>
-                            <p class="text-slate-600 leading-relaxed mb-8">
-                                Мы с вами убедились, что <strong>Nutridrink</strong> улучшает восстановление после инсульта. Справочник придет вам на почту, указанную при регистрации, в ближайшее время.
+                        <div class="screen-container text-center py-4">
+                            <h2 class="text-xl font-bold text-black mb-4">Формула требует точности!</h2>
+                            <p class="text-sm leading-relaxed opacity-90 mb-6 px-2">
+                                Похоже, один из элементов формулы был введен неверно. Но в медицине важен каждый опыт!
                             </p>
-                            <button onclick="restart()" class="text-purple-600 font-semibold text-sm underline">Вернуться в начало</button>
+                            <div class="bg-app-white/80 border border-[#DFCBDE] p-4 rounded-xl text-left text-xs mb-6 space-y-2">
+                                <p class="font-semibold text-black">Чтобы ваша клиническая практика всегда опиралась на точные данные, мы подготовили для вас Полный электронный справочник по продуктам Nutricia.</p>
+                                <p class="opacity-80"><strong class="text-[#A45494]">Обратите внимание:</strong> Ссылка на справочник будет отправлена на email, который вы указали в анкете.</p>
+                            </div>
+                            <p class="text-sm italic font-medium mb-8">Спасибо, что провели этот день с Nutricia!</p>
+                            <button onclick="restart()" class="text-xs font-bold uppercase tracking-wider text-[#A45494] hover:opacity-80 underline underline-offset-4 decoration-2">
+                                Вернуться в начало
+                            </button>
                         </div>
                     `;
                 }
